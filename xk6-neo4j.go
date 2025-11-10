@@ -78,15 +78,15 @@ func (d *Neo4j) NewDriver(conf DriverConfig) Neo4jDriver {
 	}
 }
 
-func (d *Neo4jDriver) Read(query string, parameters map[string]any) []neo4j.Record {
+func (d *Neo4jDriver) Read(query string, parameters map[string]any) []*neo4j.Record {
 	return d.ExecuteQuery(neo4j.AccessModeRead, query, parameters)
 }
 
-func (d *Neo4jDriver) Write(query string, parameters map[string]any) []neo4j.Record {
+func (d *Neo4jDriver) Write(query string, parameters map[string]any) []*neo4j.Record {
 	return d.ExecuteQuery(neo4j.AccessModeWrite, query, parameters)
 }
 
-func (d *Neo4jDriver) ExecuteQuery(accessMode neo4j.AccessMode, query string, parameters map[string]any) []neo4j.Record {
+func (d *Neo4jDriver) ExecuteQuery(accessMode neo4j.AccessMode, query string, parameters map[string]any) []*neo4j.Record {
 	ctx := d.vu.Context()
 
 	session := d.driver.NewSession(ctx, neo4j.SessionConfig{
@@ -101,10 +101,11 @@ func (d *Neo4jDriver) ExecuteQuery(accessMode neo4j.AccessMode, query string, pa
 	if err != nil {
 		panic(fmt.Errorf("failed to execute query: %w", err))
 	}
-	records := []neo4j.Record{}
-	for result.Next(ctx) {
-		records = append(records, *result.Record())
+	records, err := result.Collect(ctx)
+	if err != nil {
+		panic(fmt.Errorf("failed to collect results: %w", err))
 	}
+
 	return records
 }
 

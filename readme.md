@@ -51,3 +51,17 @@ export default function () {
     console.log(readExecResult) // [{"values":[{"id":1,"element_id":"4:17dbeda4-05f9-46b3-8fe2-9c480144afda:1","labels":["Person"],"props":{"country":"USA","year":1921,"name":"Murray"}}],"keys":["p"]}]
 }
 ```
+
+## Development
+
+To build a k6 version with this extension in a local directory, run the following command:
+
+```
+xk6 build --with xk6-neo4j=.
+```
+
+To run a docker container to run tests, run the following command:
+
+```
+docker run --rm -p 7687:7687 --env NEO4J_AUTH=neo4j/neo4jpass neo4j
+```
